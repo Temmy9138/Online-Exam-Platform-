@@ -22,7 +22,7 @@ const allowedPages = new Set([
     'adminreset_newpassword.html',
     'admin_dashbroad.html',
     'forgotten_password.html',
-    'home.html',
+    'index.html',
     'login.html',
     'signup.html',
     'student_dashboard.html'
@@ -857,7 +857,7 @@ const server = http.createServer(async (request, response) => {
         return;
     }
 
-    const requestedPage = url.pathname === '/' ? 'home.html' : decodeURIComponent(url.pathname.slice(1));
+    const requestedPage = url.pathname === '/' ? 'index.html' : decodeURIComponent(url.pathname.slice(1));
     if (!allowedPages.has(requestedPage)) {
         response.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
         response.end('Page not found.');
