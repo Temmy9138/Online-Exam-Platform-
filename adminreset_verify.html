@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Verify Reset Code</title>
+</head>
+<body>
+<h2>Enter verification code</h2>
+<p>For local testing, find the reset code in the terminal running the server. Email delivery is not configured.</p>
+<form id="verifyForm">
+<label>Email: <input type="email" id="email" required readonly></label><br>
+<label>Code: <input type="text" id="code" required></label><br>
+<button type="submit">Verify</button>
+</form>
+<div id="msg"></div>
+<script>
+const emailInput = document.getElementById('email');
+emailInput.value = localStorage.getItem('exampro_resetEmail') || '';
+if (!emailInput.value) {
+  document.getElementById('msg').textContent = 'Email is missing. Return to forgot password and request a new code.';
+  document.querySelector('#verifyForm button').disabled = true;
+}
+document.getElementById('verifyForm').addEventListener('submit', async function(e){
+  e.preventDefault();
+  const email = document.getElementById('email').value.trim();
+  const code = document.getElementById('code').value.trim();
+  const msg = document.getElementById('msg');
+  msg.textContent = '';
+  try {
+    const res = await fetch('/api/admin/password-reset/verify', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email, code})});
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Verify failed');
+    // store resetToken and open new password page
+    localStorage.setItem('exampro_resetToken', data.resetToken);
+    localStorage.setItem('exampro_resetEmail', email);
+    window.location.href = 'adminreset_newpassword.html';
+  } catch (err) {
+    msg.textContent = err.message || err;
+  }
+});
+</script>
+</body>
+</html>
